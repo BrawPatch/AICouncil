@@ -45,7 +45,7 @@ These files are agent instructions, not Python agent implementations. They are n
 
 There are at least three separate prototypes in this repository. None currently implements the complete desired business-to-production Council.
 
-1. **Generated LangGraph developer loop**: `MultiAgentCouncil/` is a modular pipeline scaffold produced by [CouncilBuilder.py](CouncilBuilder.py). Its entry point is `MultiAgentCouncil/StartCouncil.py`.
+1. **Generated LangGraph developer loop**: `MultiAgentCouncil/` is a modular pipeline scaffold originally produced by `CouncilBuilder.py` (since retired and removed; it remains in git history). Its entry point is `MultiAgentCouncil/StartCouncil.py`.
 2. **Interactive LLM answer council**: [council.py](council.py) prompts a user, optionally loads a context file/directory, asks Qwen and Mistral for answers, obtains cross-critiques, then asks Llama to synthesize a verdict.
 3. **Product backlog council**: [ProductOwner.py](ProductOwner.py) loads requirements from a path, asks Qwen and Mistral to draft prioritized user stories, cross-critiques both drafts, asks Llama to synthesize a MoSCoW backlog, and saves `backlog.md` (or a supplied output path).
 
