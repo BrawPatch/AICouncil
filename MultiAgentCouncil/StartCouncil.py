@@ -64,7 +64,8 @@ def main() -> None:
     base_dir = Path(__file__).resolve().parent
     env = dict(os.environ, OLLAMA_KEEP_ALIVE="0s")
     print("\n🚀 Launching orchestrator...\n")
-    result = subprocess.run([str(py), str(base_dir / "orchestrator.py")], cwd=str(base_dir), env=env)
+    # Arguments (--story, --lang, --project) are passed straight through to the orchestrator.
+    result = subprocess.run([str(py), str(base_dir / "orchestrator.py"), *sys.argv[1:]], cwd=str(base_dir), env=env)
     sys.exit(result.returncode)
 
 

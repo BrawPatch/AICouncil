@@ -3,6 +3,7 @@ from langgraph.graph import StateGraph, END
 
 from state_schema import CouncilState
 from memory_manager import load_historical_memory, persist_session_knowledge
+from run_config import parse_args, resolve_config
 
 from agents.requirements import run_requirements_agent
 from agents.security import run_security_agent
@@ -54,23 +55,22 @@ workflow.add_edge('promotion_gate', END)
 app = workflow.compile()
 
 
-def start_execution_harness():
+def main(argv=None):
+    """Runs the council once and returns the final state.
+
+    Usage: orchestrator.py [--story STORY] [--lang LANG] [--project NAME]
+    With --story the run never prompts; without it the story (and language) are asked for.
+    """
+    args = parse_args(argv)
+    config = resolve_config(args)
+
     loaded_memory = load_historical_memory()
     print('📖 Loaded global context files from storage ecosystem successfully.')
 
-    print('\n💬 --- Welcome to the Agile Council Configuration Matrix ---')
-    user_story = input('⌨️ Provide input User Story: ').strip()
-    if not user_story:
-        user_story = 'As a Customer, I want to securely pay via an API endpoint, so that my account credentials remain encrypted.'
-    
-    lang_stack = input('⌨️ Choose target language [Python/JavaScript/Go] (Default: Python): ').strip()
-    if not lang_stack:
-        lang_stack = 'Python'
-
     initial_input: CouncilState = {
-        'project_name': 'modular_billing_system',
-        'target_lang': lang_stack,
-        'raw_user_story': user_story,
+        'project_name': config['project_name'],
+        'target_lang': config['target_lang'],
+        'raw_user_story': config['raw_user_story'],
         'historical_memory': loaded_memory,
         'functional_specs': '',
         'tdd_criteria': '',
@@ -84,10 +84,11 @@ def start_execution_harness():
         'promotion_approved': False,
         'repair_attempts': 0
     }
-    
-    print('\n🚀 Triggering modular state workflow engine...')
+
+    print(f"\n🚀 Triggering modular state workflow engine "
+          f"(project: {config['project_name']}, language: {config['target_lang']})...")
     final_output = app.invoke(initial_input, {'recursion_limit': 60})
-    
+
     persist_session_knowledge(
         project_name=final_output['project_name'],
         raw_story=final_output['raw_user_story'],
@@ -95,7 +96,8 @@ def start_execution_harness():
         approved=final_output['promotion_approved']
     )
     print('\n[✨ Success] Execution finished cleanly.')
+    return final_output
 
 
 if __name__ == '__main__':
-    start_execution_harness()
+    main()
